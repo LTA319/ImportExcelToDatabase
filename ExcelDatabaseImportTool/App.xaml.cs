@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using ExcelDatabaseImportTool.Data.Context;
 using ExcelDatabaseImportTool.Services.Database;
+using ExcelDatabaseImportTool.Services.ErrorHandling;
+using ExcelDatabaseImportTool.Services.Logging;
 using ExcelDatabaseImportTool.Utilities;
 using ExcelDatabaseImportTool.ViewModels;
 using OfficeOpenXml;
@@ -21,6 +23,7 @@ public partial class App : Application
 {
     private IHost? _host;
     private ILogger<App>? _logger;
+    private IErrorHandlingService? _errorHandlingService;
 
     public App()
     {
@@ -50,6 +53,7 @@ public partial class App : Application
 
             // Get logger after host is built
             _logger = _host.Services.GetRequiredService<ILogger<App>>();
+            _errorHandlingService = _host.Services.GetRequiredService<IErrorHandlingService>();
             _logger.LogInformation("Application starting...");
 
             // Start the host
@@ -59,6 +63,10 @@ public partial class App : Application
             // Initialize database
             await InitializeDatabaseAsync();
             _logger.LogInformation("Database initialized successfully");
+
+            // Perform log cleanup
+            await PerformLogCleanupAsync();
+            _logger.LogInformation("Log cleanup completed");
 
             // Create and show main window
             var mainWindowViewModel = _host.Services.GetRequiredService<MainWindowViewModel>();
@@ -74,11 +82,25 @@ public partial class App : Application
         {
             _logger?.LogCritical(ex, "Fatal error during application startup");
             
-            MessageBox.Show(
-                $"A critical error occurred during application startup:\n\n{ex.Message}\n\nThe application will now close.",
-                "Startup Error",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
+            if (_errorHandlingService != null)
+            {
+                await _errorHandlingService.HandleCriticalErrorAsync(ex, "Application Startup");
+                var userMessage = _errorHandlingService.GetUserFriendlyMessage(ex);
+                
+                MessageBox.Show(
+                    $"{userMessage}\n\nA crash report has been created. The application will now close.",
+                    "Startup Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            else
+            {
+                MessageBox.Show(
+                    $"A critical error occurred during application startup:\n\n{ex.Message}\n\nThe application will now close.",
+                    "Startup Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
             
             Shutdown(1);
         }
@@ -182,38 +204,110 @@ public partial class App : Application
         }
     }
 
-    private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+    private async void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
         var exception = e.ExceptionObject as Exception;
         _logger?.LogCritical(exception, "Unhandled exception in AppDomain");
         
-        MessageBox.Show(
-            $"A critical unhandled error occurred:\n\n{exception?.Message}\n\nThe application will now close.",
-            "Critical Error",
-            MessageBoxButton.OK,
-            MessageBoxImage.Error);
+        if (_errorHandlingService != null && exception != null)
+        {
+            await _errorHandlingService.HandleCriticalErrorAsync(exception, "AppDomain Unhandled Exception");
+            var userMessage = _errorHandlingService.GetUserFriendlyMessage(exception);
+            
+            MessageBox.Show(
+                $"{userMessage}\n\nA crash report has been created. The application will now close.",
+                "Critical Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
+        else
+        {
+            MessageBox.Show(
+                $"A critical unhandled error occurred:\n\n{exception?.Message}\n\nThe application will now close.",
+                "Critical Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+        }
     }
 
-    private void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+    private async void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
     {
         _logger?.LogError(e.Exception, "Unhandled exception in Dispatcher");
         
-        MessageBox.Show(
-            $"An unexpected error occurred:\n\n{e.Exception.Message}\n\nPlease try again or restart the application.",
-            "Error",
-            MessageBoxButton.OK,
-            MessageBoxImage.Error);
-        
-        // Mark as handled to prevent application crash
-        e.Handled = true;
+        if (_errorHandlingService != null)
+        {
+            await _errorHandlingService.LogErrorAsync(e.Exception, "Dispatcher Unhandled Exception", ErrorSeverity.Error);
+            var userMessage = _errorHandlingService.GetUserFriendlyMessage(e.Exception);
+            
+            var result = MessageBox.Show(
+                $"{userMessage}\n\nWould you like to continue running the application?",
+                "Error",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Error);
+            
+            if (result == MessageBoxResult.Yes)
+            {
+                // Attempt recovery
+                var recovered = await _errorHandlingService.TryRecoverAsync(e.Exception, "Dispatcher");
+                if (recovered)
+                {
+                    _logger?.LogInformation("Successfully recovered from dispatcher exception");
+                }
+                
+                // Mark as handled to prevent application crash
+                e.Handled = true;
+            }
+            else
+            {
+                // User chose to exit
+                e.Handled = false;
+                Shutdown(1);
+            }
+        }
+        else
+        {
+            MessageBox.Show(
+                $"An unexpected error occurred:\n\n{e.Exception.Message}\n\nPlease try again or restart the application.",
+                "Error",
+                MessageBoxButton.OK,
+                MessageBoxImage.Error);
+            
+            // Mark as handled to prevent application crash
+            e.Handled = true;
+        }
     }
 
-    private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+    private async void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
     {
         _logger?.LogError(e.Exception, "Unobserved task exception");
         
+        if (_errorHandlingService != null)
+        {
+            await _errorHandlingService.LogErrorAsync(e.Exception, "Unobserved Task Exception", ErrorSeverity.Warning);
+        }
+        
         // Mark as observed to prevent application crash
         e.SetObserved();
+    }
+
+    private async Task PerformLogCleanupAsync()
+    {
+        try
+        {
+            using var scope = _host!.Services.CreateScope();
+            var logManager = new LogFileManager(
+                scope.ServiceProvider.GetRequiredService<ILogger<LogFileManager>>());
+            
+            var deletedCount = await logManager.CleanupOldLogsAsync();
+            if (deletedCount > 0)
+            {
+                _logger?.LogInformation("Cleaned up {Count} old log files", deletedCount);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogWarning(ex, "Failed to perform log cleanup");
+        }
     }
 }
 
