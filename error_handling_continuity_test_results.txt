@@ -1,3 +1,0 @@
-Running error handling continuity tests...
-FAIL: Some records should have succeeded despite other records failing
-Error handling continuity tests completed.
