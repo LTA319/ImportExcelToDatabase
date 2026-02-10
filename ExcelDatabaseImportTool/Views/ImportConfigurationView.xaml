@@ -1,0 +1,409 @@
+<UserControl x:Class="ExcelDatabaseImportTool.Views.ImportConfigurationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ExcelDatabaseImportTool.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="650" d:DesignWidth="1100">
+    
+    <UserControl.Resources>
+        <!-- Button Styles -->
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#2196F3"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1976D2"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#BDBDBD"/>
+                    <Setter Property="Cursor" Value="Arrow"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
+            <Setter Property="Background" Value="#757575"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#616161"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DangerButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
+            <Setter Property="Background" Value="#F44336"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#D32F2F"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SuccessButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
+            <Setter Property="Background" Value="#4CAF50"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#388E3C"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#F5F5F5" Padding="15" Margin="0,0,0,10" CornerRadius="4">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Import Configurations" 
+                             FontSize="20" 
+                             FontWeight="Bold"
+                             Foreground="#424242"/>
+                    <TextBlock Text="Configure field mappings between Excel columns and database tables" 
+                             FontSize="12" 
+                             Foreground="#757575"
+                             Margin="0,5,0,0"/>
+                </StackPanel>
+
+                <Button Grid.Column="1" 
+                        Content="➕ Add New Configuration" 
+                        Command="{Binding AddImportConfigurationCommand}"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" MinWidth="300"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="3*" MinWidth="500"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Configuration List -->
+            <Border Grid.Column="0" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Background="#FAFAFA" Padding="10" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1">
+                        <TextBlock Text="Saved Configurations" FontWeight="SemiBold" FontSize="14"/>
+                    </Border>
+
+                    <DataGrid Grid.Row="1"
+                            ItemsSource="{Binding ImportConfigurations}"
+                            SelectedItem="{Binding SelectedImportConfiguration}"
+                            AutoGenerateColumns="False"
+                            IsReadOnly="True"
+                            SelectionMode="Single"
+                            GridLinesVisibility="Horizontal"
+                            HeadersVisibility="Column"
+                            RowHeight="40"
+                            Background="White">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*" MinWidth="100"/>
+                            <DataGridTextColumn Header="Table" Binding="{Binding TableName}" Width="100"/>
+                            <DataGridTemplateColumn Header="Actions" Width="150">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Content="Edit" 
+                                                    Command="{Binding DataContext.EditImportConfigurationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Style="{StaticResource PrimaryButtonStyle}"
+                                                    Padding="8,4"
+                                                    Margin="2"/>
+                                            <Button Content="Delete" 
+                                                    Command="{Binding DataContext.DeleteImportConfigurationCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Style="{StaticResource DangerButtonStyle}"
+                                                    Padding="8,4"
+                                                    Margin="2"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="#E0E0E0"/>
+
+            <!-- Configuration Form -->
+            <Border Grid.Column="2" BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="15" IsEnabled="{Binding IsEditing}">
+                        <TextBlock Text="Configuration Details" 
+                                 FontSize="16" 
+                                 FontWeight="SemiBold"
+                                 Margin="0,0,0,15"/>
+
+                        <!-- Configuration Name -->
+                        <TextBlock Text="Configuration Name *" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <TextBox Text="{Binding CurrentImportConfiguration.Name, UpdateSourceTrigger=PropertyChanged}" 
+                               Padding="8" 
+                               FontSize="13"
+                               Margin="0,0,0,15"/>
+
+                        <!-- Database Configuration -->
+                        <TextBlock Text="Database Configuration *" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding DatabaseConfigurations}"
+                                SelectedValue="{Binding CurrentImportConfiguration.DatabaseConfigurationId}"
+                                SelectedValuePath="Id"
+                                DisplayMemberPath="Name"
+                                Padding="8" 
+                                FontSize="13"
+                                Margin="0,0,0,15"/>
+
+                        <!-- Table Name -->
+                        <TextBlock Text="Target Table Name *" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                        <TextBox Text="{Binding CurrentImportConfiguration.TableName, UpdateSourceTrigger=PropertyChanged}" 
+                               Padding="8" 
+                               FontSize="13"
+                               Margin="0,0,0,15"/>
+
+                        <!-- Has Header Row -->
+                        <CheckBox Content="Excel file has header row" 
+                                IsChecked="{Binding CurrentImportConfiguration.HasHeaderRow}"
+                                Margin="0,0,0,20"/>
+
+                        <!-- Field Mappings Section -->
+                        <Border BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,15">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <TextBlock Grid.Column="0" 
+                                             Text="Field Mappings" 
+                                             FontWeight="SemiBold" 
+                                             FontSize="14"
+                                             VerticalAlignment="Center"/>
+                                    
+                                    <Button Grid.Column="1" 
+                                            Content="➕ Add Mapping" 
+                                            Command="{Binding AddFieldMappingCommand}"
+                                            Style="{StaticResource SuccessButtonStyle}"
+                                            Padding="8,4"/>
+                                </Grid>
+
+                                <!-- Field Mappings List -->
+                                <DataGrid ItemsSource="{Binding FieldMappings}"
+                                        SelectedItem="{Binding SelectedFieldMapping}"
+                                        AutoGenerateColumns="False"
+                                        IsReadOnly="True"
+                                        SelectionMode="Single"
+                                        GridLinesVisibility="All"
+                                        HeadersVisibility="Column"
+                                        RowHeight="35"
+                                        MaxHeight="200"
+                                        Background="White">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Excel Column" Binding="{Binding ExcelColumnName}" Width="*" MinWidth="100"/>
+                                        <DataGridTextColumn Header="Database Field" Binding="{Binding DatabaseFieldName}" Width="*" MinWidth="100"/>
+                                        <DataGridCheckBoxColumn Header="Required" Binding="{Binding IsRequired}" Width="70"/>
+                                        <DataGridTextColumn Header="Type" Binding="{Binding DataType}" Width="80"/>
+                                        <DataGridTemplateColumn Header="Actions" Width="150">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                        <Button Content="Edit" 
+                                                                Command="{Binding DataContext.EditFieldMappingCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                CommandParameter="{Binding}"
+                                                                Style="{StaticResource PrimaryButtonStyle}"
+                                                                Padding="6,3"
+                                                                Margin="2"/>
+                                                        <Button Content="Delete" 
+                                                                Command="{Binding DataContext.DeleteFieldMappingCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                                CommandParameter="{Binding}"
+                                                                Style="{StaticResource DangerButtonStyle}"
+                                                                Padding="6,3"
+                                                                Margin="2"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+
+                                <!-- Field Mapping Edit Form -->
+                                <Border BorderBrush="#2196F3" 
+                                      BorderThickness="2" 
+                                      CornerRadius="4" 
+                                      Padding="10" 
+                                      Margin="0,10,0,0"
+                                      Visibility="{Binding IsEditingFieldMapping, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                    <StackPanel>
+                                        <TextBlock Text="Edit Field Mapping" FontWeight="SemiBold" Margin="0,0,0,10"/>
+
+                                        <TextBlock Text="Excel Column Name *" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                        <TextBox Text="{Binding CurrentFieldMapping.ExcelColumnName, UpdateSourceTrigger=PropertyChanged}" 
+                                               Padding="6" 
+                                               FontSize="12"
+                                               Margin="0,0,0,10"/>
+
+                                        <TextBlock Text="Database Field Name *" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                        <TextBox Text="{Binding CurrentFieldMapping.DatabaseFieldName, UpdateSourceTrigger=PropertyChanged}" 
+                                               Padding="6" 
+                                               FontSize="12"
+                                               Margin="0,0,0,10"/>
+
+                                        <TextBlock Text="Data Type *" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                        <ComboBox SelectedItem="{Binding CurrentFieldMapping.DataType}" 
+                                                Padding="6" 
+                                                FontSize="12"
+                                                Margin="0,0,0,10">
+                                            <ComboBoxItem Content="string"/>
+                                            <ComboBoxItem Content="int"/>
+                                            <ComboBoxItem Content="decimal"/>
+                                            <ComboBoxItem Content="datetime"/>
+                                            <ComboBoxItem Content="bool"/>
+                                        </ComboBox>
+
+                                        <CheckBox Content="Required Field" 
+                                                IsChecked="{Binding CurrentFieldMapping.IsRequired}"
+                                                Margin="0,0,0,10"/>
+
+                                        <!-- Foreign Key Configuration -->
+                                        <Border BorderBrush="#E0E0E0" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,10">
+                                            <StackPanel>
+                                                <Grid Margin="0,0,0,5">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    
+                                                    <TextBlock Grid.Column="0" 
+                                                             Text="Foreign Key Mapping" 
+                                                             FontWeight="SemiBold"
+                                                             VerticalAlignment="Center"/>
+                                                    
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                        <Button Content="Configure" 
+                                                                Command="{Binding ConfigureForeignKeyCommand}"
+                                                                Style="{StaticResource PrimaryButtonStyle}"
+                                                                Padding="6,3"
+                                                                Margin="2"/>
+                                                        <Button Content="Remove" 
+                                                                Command="{Binding RemoveForeignKeyMappingCommand}"
+                                                                Style="{StaticResource DangerButtonStyle}"
+                                                                Padding="6,3"
+                                                                Margin="2"/>
+                                                    </StackPanel>
+                                                </Grid>
+
+                                                <!-- Foreign Key Details -->
+                                                <Border Background="#E3F2FD" 
+                                                      Padding="8" 
+                                                      CornerRadius="4"
+                                                      Visibility="{Binding IsConfiguringForeignKey, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                                    <StackPanel>
+                                                        <TextBlock Text="Referenced Table *" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                                        <TextBox Text="{Binding CurrentForeignKeyMapping.ReferencedTable, UpdateSourceTrigger=PropertyChanged}" 
+                                                               Padding="6" 
+                                                               FontSize="12"
+                                                               Margin="0,0,0,8"/>
+
+                                                        <TextBlock Text="Lookup Field (for matching) *" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                                        <TextBox Text="{Binding CurrentForeignKeyMapping.ReferencedLookupField, UpdateSourceTrigger=PropertyChanged}" 
+                                                               Padding="6" 
+                                                               FontSize="12"
+                                                               Margin="0,0,0,8"/>
+
+                                                        <TextBlock Text="Key Field (ID to return) *" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                                        <TextBox Text="{Binding CurrentForeignKeyMapping.ReferencedKeyField, UpdateSourceTrigger=PropertyChanged}" 
+                                                               Padding="6" 
+                                                               FontSize="12"
+                                                               Margin="0,0,0,8"/>
+
+                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                                            <Button Content="Save FK" 
+                                                                  Command="{Binding SaveForeignKeyMappingCommand}"
+                                                                  Style="{StaticResource SuccessButtonStyle}"
+                                                                  Padding="8,4"/>
+                                                            <Button Content="Cancel" 
+                                                                  Command="{Binding CancelForeignKeyConfigurationCommand}"
+                                                                  Style="{StaticResource SecondaryButtonStyle}"
+                                                                  Padding="8,4"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </Border>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                            <Button Content="Save Mapping" 
+                                                  Command="{Binding SaveFieldMappingCommand}"
+                                                  Style="{StaticResource SuccessButtonStyle}"/>
+                                            <Button Content="Cancel" 
+                                                  Command="{Binding CancelFieldMappingEditCommand}"
+                                                  Style="{StaticResource SecondaryButtonStyle}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Action Buttons -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+                            <Button Content="Save Configuration" 
+                                  Command="{Binding SaveImportConfigurationCommand}"
+                                  Style="{StaticResource PrimaryButtonStyle}"/>
+                            <Button Content="Cancel" 
+                                  Command="{Binding CancelEditCommand}"
+                                  Style="{StaticResource SecondaryButtonStyle}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- Validation Errors -->
+        <Border Grid.Row="2" 
+              Background="#FFEBEE" 
+              Padding="10" 
+              Margin="0,10,0,0"
+              CornerRadius="4"
+              Visibility="{Binding ValidationErrors, Converter={StaticResource StringToVisibilityConverter}}">
+            <TextBlock Text="{Binding ValidationErrors}" 
+                     TextWrapping="Wrap"
+                     Foreground="#C62828"
+                     FontWeight="SemiBold"/>
+        </Border>
+    </Grid>
+</UserControl>

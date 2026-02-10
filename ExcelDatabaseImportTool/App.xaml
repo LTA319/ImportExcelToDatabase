@@ -1,8 +1,33 @@
 ﻿<Application x:Class="ExcelDatabaseImportTool.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:ExcelDatabaseImportTool">
+             xmlns:local="clr-namespace:ExcelDatabaseImportTool"
+             xmlns:converters="clr-namespace:ExcelDatabaseImportTool.Converters"
+             xmlns:views="clr-namespace:ExcelDatabaseImportTool.Views"
+             xmlns:viewmodels="clr-namespace:ExcelDatabaseImportTool.ViewModels">
     <Application.Resources>
-         
+        <!-- Value Converters -->
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+        <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter"/>
+        <converters:DurationConverter x:Key="DurationConverter"/>
+        
+        <!-- DataTemplates for ViewModels -->
+        <DataTemplate DataType="{x:Type viewmodels:DatabaseConfigurationViewModel}">
+            <views:DatabaseConfigurationView/>
+        </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type viewmodels:ImportConfigurationViewModel}">
+            <views:ImportConfigurationView/>
+        </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type viewmodels:ImportExecutionViewModel}">
+            <views:ImportExecutionView/>
+        </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type viewmodels:ImportHistoryViewModel}">
+            <views:ImportHistoryView/>
+        </DataTemplate>
     </Application.Resources>
 </Application>

@@ -4,9 +4,127 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ExcelDatabaseImportTool"
+        xmlns:viewmodels="clr-namespace:ExcelDatabaseImportTool.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="Excel Database Import Tool" 
+        Height="700" 
+        Width="1200"
+        MinHeight="600"
+        MinWidth="900"
+        WindowStartupLocation="CenterScreen">
+    
+    <Window.Resources>
+        <!-- Button Style -->
+        <Style x:Key="NavigationButtonStyle" TargetType="Button">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="Background" Value="#2196F3"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1976D2"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#0D47A1"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
 
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header / Branding -->
+        <Border Grid.Row="0" Background="#1976D2" Padding="20,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock Text="📊" FontSize="28" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBlock Text="Excel Database Import Tool" 
+                             FontSize="24" 
+                             FontWeight="Bold" 
+                             Foreground="White"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
+                
+                <TextBlock Grid.Column="1" 
+                         Text="v1.0" 
+                         FontSize="12" 
+                         Foreground="#E3F2FD"
+                         VerticalAlignment="Center"
+                         HorizontalAlignment="Right"
+                         Margin="0,0,10,0"/>
+            </Grid>
+        </Border>
+
+        <!-- Navigation Menu -->
+        <Border Grid.Row="1" Background="#F5F5F5" BorderBrush="#E0E0E0" BorderThickness="0,0,0,1" Padding="10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="Database Configurations" 
+                        Command="{Binding NavigateToDatabaseConfigurationCommand}"
+                        Style="{StaticResource NavigationButtonStyle}"/>
+                <Button Content="Import Configurations" 
+                        Command="{Binding NavigateToImportConfigurationCommand}"
+                        Style="{StaticResource NavigationButtonStyle}"/>
+                <Button Content="Execute Import" 
+                        Command="{Binding NavigateToImportExecutionCommand}"
+                        Style="{StaticResource NavigationButtonStyle}"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Content Area -->
+        <Border Grid.Row="2" Background="White" Padding="10">
+            <ContentControl Content="{Binding CurrentViewModel}">
+                <ContentControl.Resources>
+                    <!-- DataTemplate for each ViewModel will be defined in separate view files -->
+                </ContentControl.Resources>
+            </ContentControl>
+        </Border>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="3" Background="#424242" Padding="10,5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <TextBlock Grid.Column="0" 
+                         Text="Ready" 
+                         Foreground="White"
+                         VerticalAlignment="Center"/>
+                
+                <TextBlock Grid.Column="2" 
+                         Foreground="#B0BEC5"
+                         VerticalAlignment="Center">
+                    <Run Text="© 2026 Excel Database Import Tool"/>
+                </TextBlock>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

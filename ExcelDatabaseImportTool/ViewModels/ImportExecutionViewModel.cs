@@ -64,7 +64,7 @@ namespace ExcelDatabaseImportTool.ViewModels
             LoadConfigurationsCommand = new AsyncRelayCommand(LoadConfigurationsAsync);
             SelectExcelFileCommand = new RelayCommand(SelectExcelFile);
             ExecuteImportCommand = new AsyncRelayCommand(ExecuteImportAsync, CanExecuteImport);
-            CancelImportCommand = new RelayCommand(CancelImport, CanCancelImport);
+            CancelImportCommand = new RelayCommand(CancelImport, () => IsImporting && _canCancelImport);
             ClearResultsCommand = new RelayCommand(ClearResults, () => HasResults);
 
             // Load configurations on initialization
@@ -391,11 +391,6 @@ namespace ExcelDatabaseImportTool.ViewModels
                 _cancellationTokenSource?.Dispose();
                 _cancellationTokenSource = null;
             }
-        }
-
-        private bool CanCancelImport()
-        {
-            return IsImporting && CanCancelImport;
         }
 
         private void CancelImport()
