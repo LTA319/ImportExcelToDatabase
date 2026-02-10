@@ -1,0 +1,3 @@
+Running transaction atomicity tests...
+FAIL: All records should be marked as failed. Expected: 4, Actual: 0
+Transaction atomicity tests completed.
