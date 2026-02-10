@@ -186,30 +186,46 @@
 - [ ] 7. Checkpoint - Ensure all core services are working
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 8. Implement WPF ViewModels and commands
-  - [ ] 8.1 Create base ViewModel and command infrastructure
+- [-] 8. Implement WPF ViewModels and commands
+
+
+
+
+
+  - [x] 8.1 Create base ViewModel and command infrastructure
+
+
     - Implement BaseViewModel with INotifyPropertyChanged
     - Create RelayCommand and AsyncRelayCommand implementations
     - Add navigation service for view management
     - _Requirements: 1.1, 2.1, 3.1_
 
-  - [ ] 8.2 Implement DatabaseConfigurationViewModel
+  - [x] 8.2 Implement DatabaseConfigurationViewModel
+
+
     - Create ViewModel for database configuration management
     - Add commands for add, edit, delete, and test connection operations
     - Implement data binding and validation logic
     - _Requirements: 1.1, 1.2, 1.3, 1.5_
 
-  - [ ] 8.3 Write property test for referential integrity
+  - [x] 8.3 Write property test for referential integrity
+
+
     - **Property 3: Referential integrity enforcement**
     - **Validates: Requirements 1.5**
 
-  - [ ] 8.4 Implement ImportConfigurationViewModel
+  - [x] 8.4 Implement ImportConfigurationViewModel
+
+
+
     - Create ViewModel for import configuration management
     - Add field mapping and foreign key configuration logic
     - Implement validation for required field mappings
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
-  - [ ] 8.5 Write property test for import configuration validation
+  - [x] 8.5 Write property test for import configuration validation
+
+
     - **Property 4: Import configuration validation**
     - **Validates: Requirements 2.2, 2.5**
 

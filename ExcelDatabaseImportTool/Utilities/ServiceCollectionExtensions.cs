@@ -7,6 +7,7 @@ using ExcelDatabaseImportTool.Interfaces.Repositories;
 using ExcelDatabaseImportTool.Services.Database;
 using ExcelDatabaseImportTool.Services.Excel;
 using ExcelDatabaseImportTool.Services.Import;
+using ExcelDatabaseImportTool.Services.Navigation;
 using ExcelDatabaseImportTool.Repositories;
 using ExcelDatabaseImportTool.ViewModels;
 
@@ -31,6 +32,7 @@ namespace ExcelDatabaseImportTool.Utilities
             services.AddScoped<IValidationService, ValidationService>();
             services.AddScoped<IForeignKeyResolverService, ForeignKeyResolverService>();
             services.AddScoped<IEncryptionService, EncryptionService>();
+            services.AddSingleton<INavigationService, NavigationService>();
 
             // ViewModels
             services.AddTransient<MainWindowViewModel>();
