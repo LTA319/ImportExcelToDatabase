@@ -87,11 +87,8 @@ namespace ExcelDatabaseImportTool.Utilities
 
         private static void ConfigureSerilog()
         {
-            // Get log directory path
-            var logDirectory = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "ExcelDatabaseImportTool",
-                "Logs");
+            // Get log directory path - use application directory
+            var logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
 
             // Ensure log directory exists
             Directory.CreateDirectory(logDirectory);

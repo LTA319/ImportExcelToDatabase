@@ -19,10 +19,7 @@ namespace ExcelDatabaseImportTool.Services.Logging
         public ApplicationLoggingService(ILogger<ApplicationLoggingService> logger)
         {
             _logger = logger;
-            _logDirectory = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "ExcelDatabaseImportTool",
-                "Logs");
+            _logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
         }
 
         public void LogInformation(string message, string context, Dictionary<string, object>? properties = null)

@@ -23,10 +23,7 @@ namespace ExcelDatabaseImportTool.Services.Logging
             _maxLogFiles = maxLogFiles;
             _maxLogSizeBytes = maxLogSizeMB * 1024 * 1024;
             
-            _logDirectory = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "ExcelDatabaseImportTool",
-                "Logs");
+            _logDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs");
 
             Directory.CreateDirectory(_logDirectory);
         }

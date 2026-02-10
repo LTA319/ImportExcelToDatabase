@@ -17,10 +17,7 @@ namespace ExcelDatabaseImportTool.Services.ErrorHandling
         public ErrorHandlingService(ILogger<ErrorHandlingService> logger)
         {
             _logger = logger;
-            _crashReportDirectory = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "ExcelDatabaseImportTool",
-                "CrashReports");
+            _crashReportDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CrashReports");
 
             // Ensure crash report directory exists
             Directory.CreateDirectory(_crashReportDirectory);
