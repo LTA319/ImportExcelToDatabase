@@ -61,26 +61,15 @@ public partial class App : Application
         // Initialize database
         await InitializeDatabaseAsync();
 
-        // Run file validation tests
-        TestRunner.RunFileValidationTests();
-
-        // Run data validation tests
-        TestRunner.RunDataValidationTests();
-
-        // Run foreign key resolution tests
-        TestRunner.RunForeignKeyResolutionTests();
-
-        // Run transaction atomicity tests
-        TestRunner.RunTransactionAtomicityTests();
-
-        // Run error handling continuity tests
-        TestRunner.RunErrorHandlingContinuityTests();
-
-        // Run import statistics tests
-        TestRunner.RunImportStatisticsTests();
-
-        // Run comprehensive logging tests
-        TestRunner.RunComprehensiveLoggingTests();
+        // NOTE: Property-based tests are commented out for normal application startup
+        // Uncomment these lines if you want to run tests on startup
+        // TestRunner.RunFileValidationTests();
+        // TestRunner.RunDataValidationTests();
+        // TestRunner.RunForeignKeyResolutionTests();
+        // TestRunner.RunTransactionAtomicityTests();
+        // TestRunner.RunErrorHandlingContinuityTests();
+        // TestRunner.RunImportStatisticsTests();
+        // TestRunner.RunComprehensiveLoggingTests();
 
         // Start the host
         await _host.StartAsync();

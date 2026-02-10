@@ -1,6 +1,6 @@
 using ExcelDatabaseImportTool.Tests.PropertyTests;
 
-namespace ExcelDatabaseImportTool
+namespace ExcelDatabaseImportTool.Tests
 {
     public static class TestRunner
     {

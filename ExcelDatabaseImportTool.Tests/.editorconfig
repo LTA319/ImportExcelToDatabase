@@ -1,0 +1,7 @@
+# EditorConfig for test project
+
+root = false
+
+[*.cs]
+# Disable NUnit1027 for FsCheck property tests
+dotnet_diagnostic.NUnit1027.severity = none
