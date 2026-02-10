@@ -136,33 +136,49 @@
     - **Property 6: Foreign key resolution accuracy**
     - **Validates: Requirements 2.4, 5.2**
 
-- [ ] 6. Implement core import service
-  - [ ] 6.1 Create import service with transaction management
+- [x] 6. Implement core import service
+
+
+
+
+  - [x] 6.1 Create import service with transaction management
+
+
     - Implement IImportService with database transaction support
     - Add batch processing logic for large datasets
     - Implement progress reporting and cancellation support
     - Add comprehensive error handling and rollback logic
     - _Requirements: 5.3, 5.4, 5.5_
 
-  - [ ] 6.2 Write property test for transaction atomicity
+  - [x] 6.2 Write property test for transaction atomicity
+
+
     - **Property 12: Transaction atomicity**
     - **Validates: Requirements 5.3, 5.4, 5.5**
 
-  - [ ] 6.3 Write property test for error handling continuity
+  - [x] 6.3 Write property test for error handling continuity
+
+
     - **Property 8: Error handling continuity**
     - **Validates: Requirements 3.4**
 
-  - [ ] 6.4 Write property test for import statistics
+  - [x] 6.4 Write property test for import statistics
+
+
     - **Property 9: Import statistics accuracy**
     - **Validates: Requirements 3.5**
 
-  - [ ] 6.5 Implement import logging integration
+  - [x] 6.5 Implement import logging integration
+
+
     - Add comprehensive logging throughout import process
     - Implement log entry creation and updates
     - Add error detail collection and storage
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-  - [ ] 6.6 Write property test for comprehensive logging
+  - [x] 6.6 Write property test for comprehensive logging
+
+
     - **Property 10: Comprehensive import logging**
     - **Validates: Requirements 4.1, 4.2, 4.3, 4.4**
 

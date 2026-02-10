@@ -70,6 +70,18 @@ public partial class App : Application
         // Run foreign key resolution tests
         TestRunner.RunForeignKeyResolutionTests();
 
+        // Run transaction atomicity tests
+        TestRunner.RunTransactionAtomicityTests();
+
+        // Run error handling continuity tests
+        TestRunner.RunErrorHandlingContinuityTests();
+
+        // Run import statistics tests
+        TestRunner.RunImportStatisticsTests();
+
+        // Run comprehensive logging tests
+        TestRunner.RunComprehensiveLoggingTests();
+
         // Start the host
         await _host.StartAsync();
 

@@ -18,5 +18,25 @@ namespace ExcelDatabaseImportTool
         {
             ForeignKeyResolutionTests.RunForeignKeyResolutionTests();
         }
+
+        public static void RunTransactionAtomicityTests()
+        {
+            TransactionAtomicityTests.RunTransactionAtomicityTests();
+        }
+
+        public static void RunErrorHandlingContinuityTests()
+        {
+            ErrorHandlingContinuityTests.RunErrorHandlingContinuityTests();
+        }
+
+        public static void RunImportStatisticsTests()
+        {
+            ImportStatisticsTests.RunImportStatisticsTests();
+        }
+
+        public static void RunComprehensiveLoggingTests()
+        {
+            ComprehensiveLoggingTests.RunComprehensiveLoggingTests();
+        }
     }
 }
