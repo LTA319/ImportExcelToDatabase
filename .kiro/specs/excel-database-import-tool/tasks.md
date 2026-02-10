@@ -229,11 +229,16 @@
     - **Property 4: Import configuration validation**
     - **Validates: Requirements 2.2, 2.5**
 
-  - [ ] 8.6 Write property test for field mapping consistency
+  - [x] 8.6 Write property test for field mapping consistency
+
     - **Property 5: Field mapping consistency**
     - **Validates: Requirements 2.3**
 
-  - [ ] 8.7 Implement ImportExecutionViewModel
+  - [x] 8.7 Implement ImportExecutionViewModel
+
+
+
+
     - Create ViewModel for import execution interface
     - Add file selection and import execution commands
     - Implement progress tracking and status updates

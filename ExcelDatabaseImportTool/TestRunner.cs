@@ -38,5 +38,10 @@ namespace ExcelDatabaseImportTool
         {
             ComprehensiveLoggingTests.RunComprehensiveLoggingTests();
         }
+
+        public static void RunFieldMappingConsistencyTests()
+        {
+            FieldMappingConsistencyTests.RunFieldMappingConsistencyTests();
+        }
     }
 }
