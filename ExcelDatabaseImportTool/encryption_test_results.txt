@@ -1,0 +1,16 @@
+Running encryption tests...
+PASS: Round trip successful for password type: normal
+PASS: Round trip successful for password type: normal
+PASS: Round trip successful for password type: normal
+PASS: Round trip successful for password type: with_spaces
+PASS: Round trip successful for password type: unicode
+PASS: Round trip successful for password type: numeric
+PASS: Round trip successful for password type: special_chars
+PASS: Encryption/decryption is consistent
+PASS: Round trip successful for edge case: single_char
+PASS: Correctly threw exception for empty/null password
+PASS: Round trip successful for edge case: very_long
+PASS: Round trip successful for edge case: special_chars
+PASS: Round trip successful for edge case: normal
+PASS: Round trip successful for edge case: normal
+Encryption tests completed.

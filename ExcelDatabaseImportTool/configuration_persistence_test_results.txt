@@ -1,0 +1,5 @@
+Running configuration persistence tests...
+PASS: All connection parameters persisted correctly for: MySQL Test Config
+PASS: All connection parameters persisted correctly for: SQL Server Test Config
+PASS: All import configuration fields persisted correctly for: Test Import Config
+Configuration persistence tests completed.
