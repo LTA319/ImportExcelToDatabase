@@ -35,42 +35,7 @@ namespace ExcelDatabaseImportTool.Tests.PerformanceTests
         [SetUp]
         public void Setup()
         {
-            // Set EPPlus license for version 8+ using reflection to avoid version-specific dependencies
-            try
-            {
-                var licenseProperty = typeof(ExcelPackage).GetProperty("License", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                if (licenseProperty != null)
-                {
-                    var licenseObject = licenseProperty.GetValue(null);
-                    if (licenseObject != null)
-                    {
-                        var contextProperty = licenseObject.GetType().GetProperty("Context");
-                        if (contextProperty != null)
-                        {
-                            var licenseContextType = typeof(ExcelPackage).Assembly.GetType("OfficeOpenXml.LicenseContext");
-                            if (licenseContextType != null)
-                            {
-                                var nonCommercialValue = Enum.Parse(licenseContextType, "NonCommercial");
-                                contextProperty.SetValue(licenseObject, nonCommercialValue);
-                            }
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                // If reflection fails, try the old API
-                try
-                {
-#pragma warning disable CS0618
-                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-#pragma warning restore CS0618
-                }
-                catch
-                {
-                    // License setting failed, continue anyway
-                }
-            }
+            // No license setup needed here - will be set globally
 
             // Create in-memory database for testing
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()

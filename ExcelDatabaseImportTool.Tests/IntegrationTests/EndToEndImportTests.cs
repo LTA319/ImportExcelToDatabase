@@ -35,35 +35,7 @@ namespace ExcelDatabaseImportTool.Tests.IntegrationTests
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
-            // Set EPPlus license for version 8+ using the new License API
-            // ExcelPackage.License.Context = LicenseContext.NonCommercial;
-            // Using reflection to avoid compile-time dependency on specific EPPlus version
-            try
-            {
-                var licenseProperty = typeof(ExcelPackage).GetProperty("License", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-                if (licenseProperty != null)
-                {
-                    var licenseObject = licenseProperty.GetValue(null);
-                    if (licenseObject != null)
-                    {
-                        var contextProperty = licenseObject.GetType().GetProperty("Context");
-                        if (contextProperty != null)
-                        {
-                            var licenseContextType = typeof(ExcelPackage).Assembly.GetType("OfficeOpenXml.LicenseContext");
-                            if (licenseContextType != null)
-                            {
-                                var nonCommercialValue = Enum.Parse(licenseContextType, "NonCommercial");
-                                contextProperty.SetValue(licenseObject, nonCommercialValue);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log but don't fail - tests may still work
-                Console.WriteLine($"Warning: Could not set EPPlus license: {ex.Message}");
-            }
+            // No license setup needed here - will be set in AssemblyInfo or globally
         }
 
         [SetUp]
