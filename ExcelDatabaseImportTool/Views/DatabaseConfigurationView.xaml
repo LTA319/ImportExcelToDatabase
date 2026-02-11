@@ -181,15 +181,11 @@
 
                         <!-- Database Type -->
                         <TextBlock Text="Database Type *" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                        <ComboBox SelectedItem="{Binding CurrentConfiguration.Type}" 
+                        <ComboBox ItemsSource="{Binding DatabaseTypes}"
+                                SelectedItem="{Binding CurrentConfiguration.Type}" 
                                 Padding="8" 
                                 FontSize="13"
-                                Margin="0,0,0,15">
-                            <ComboBox.Items>
-                                <ComboBoxItem Content="MySQL" Tag="MySQL"/>
-                                <ComboBoxItem Content="SQL Server" Tag="SqlServer"/>
-                            </ComboBox.Items>
-                        </ComboBox>
+                                Margin="0,0,0,15"/>
 
                         <!-- Server -->
                         <TextBlock Text="Server *" FontWeight="SemiBold" Margin="0,0,0,5"/>

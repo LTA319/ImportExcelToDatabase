@@ -66,6 +66,11 @@ namespace ExcelDatabaseImportTool.Services.Database
                 using var connection = await CreateConnectionAsync(config);
                 return connection.State == ConnectionState.Open;
             }
+            catch (InvalidOperationException)
+            {
+                // Re-throw password decryption errors so they can be shown to the user
+                throw;
+            }
             catch (Exception ex)
             {
                 // Log the exception details for debugging but return false for test failure
@@ -82,7 +87,18 @@ namespace ExcelDatabaseImportTool.Services.Database
             if (string.IsNullOrWhiteSpace(config.EncryptedPassword))
                 throw new ArgumentException("Encrypted password cannot be null or empty", nameof(config));
 
-            var decryptedPassword = _encryptionService.Decrypt(config.EncryptedPassword);
+            string decryptedPassword;
+            try
+            {
+                decryptedPassword = _encryptionService.Decrypt(config.EncryptedPassword);
+            }
+            catch (FormatException ex)
+            {
+                throw new InvalidOperationException(
+                    $"Failed to decrypt password for database configuration '{config.Name}'. " +
+                    "The stored password may be corrupted or in an invalid format. " +
+                    "Please re-enter the password and save the configuration again.", ex);
+            }
 
             return config.Type switch
             {

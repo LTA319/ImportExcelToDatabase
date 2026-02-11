@@ -21,8 +21,8 @@ namespace ExcelDatabaseImportTool.Views
         {
             if (DataContext is DatabaseConfigurationViewModel viewModel && sender is PasswordBox passwordBox)
             {
-                // Update the encrypted password in the current configuration
-                viewModel.CurrentConfiguration.EncryptedPassword = passwordBox.Password;
+                // Update the plain text password in the ViewModel (will be encrypted on save)
+                viewModel.PlainTextPassword = passwordBox.Password;
             }
         }
     }

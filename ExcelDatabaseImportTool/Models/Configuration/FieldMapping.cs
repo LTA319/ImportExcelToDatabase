@@ -24,10 +24,14 @@ namespace ExcelDatabaseImportTool.Models.Configuration
         [MaxLength(50)]
         public string DataType { get; set; } = string.Empty;
 
+        [ForeignKey("ImportConfiguration")]
+        public int ImportConfigurationId { get; set; }
+
         [ForeignKey("ForeignKeyMapping")]
         public int? ForeignKeyMappingId { get; set; }
 
         // Navigation properties
+        public virtual ImportConfiguration? ImportConfiguration { get; set; }
         public virtual ForeignKeyMapping? ForeignKeyMapping { get; set; }
     }
 }

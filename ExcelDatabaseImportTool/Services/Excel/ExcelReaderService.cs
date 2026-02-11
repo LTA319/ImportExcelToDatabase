@@ -26,8 +26,8 @@ namespace ExcelDatabaseImportTool.Services.Excel
             if (string.IsNullOrWhiteSpace(filePath))
                 throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
 
-            if (!await ValidateFileAsync(filePath))
-                throw new InvalidOperationException($"Invalid Excel file: {filePath}");
+            // Validate file first (will throw detailed exception if invalid)
+            await ValidateFileAsync(filePath);
 
             var dataTable = new DataTable();
 
@@ -65,7 +65,7 @@ namespace ExcelDatabaseImportTool.Services.Excel
 
                 return await Task.FromResult(dataTable);
             }
-            catch (Exception ex) when (!(ex is ArgumentException || ex is InvalidOperationException))
+            catch (Exception ex) when (!(ex is ArgumentException || ex is InvalidOperationException || ex is FileNotFoundException))
             {
                 throw new InvalidOperationException($"Error reading Excel file: {ex.Message}", ex);
             }
@@ -78,8 +78,8 @@ namespace ExcelDatabaseImportTool.Services.Excel
             if (string.IsNullOrWhiteSpace(filePath))
                 throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
 
-            if (!await ValidateFileAsync(filePath))
-                throw new InvalidOperationException($"Invalid Excel file: {filePath}");
+            // Validate file first (will throw detailed exception if invalid)
+            await ValidateFileAsync(filePath);
 
             var columnNames = new List<string>();
 
@@ -104,7 +104,7 @@ namespace ExcelDatabaseImportTool.Services.Excel
 
                 return await Task.FromResult(columnNames);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!(ex is ArgumentException || ex is InvalidOperationException || ex is FileNotFoundException))
             {
                 throw new InvalidOperationException($"Error reading column names from Excel file: {ex.Message}", ex);
             }
@@ -118,30 +118,46 @@ namespace ExcelDatabaseImportTool.Services.Excel
             {
                 // Check if file exists
                 if (!File.Exists(filePath))
-                    return false;
+                {
+                    throw new FileNotFoundException($"Excel file not found: {filePath}");
+                }
 
                 // Check file extension
                 var extension = Path.GetExtension(filePath).ToLowerInvariant();
                 if (extension != ".xlsx" && extension != ".xls")
-                    return false;
+                {
+                    throw new InvalidOperationException($"Unsupported file format: {extension}. Only .xlsx and .xls files are supported.");
+                }
 
                 // Try to open the file to verify it's a valid Excel file
                 using var package = new ExcelPackage(new FileInfo(filePath));
                 
                 // Check if there's at least one worksheet
                 if (package.Workbook.Worksheets.Count == 0)
-                    return false;
+                {
+                    throw new InvalidOperationException("The Excel file contains no worksheets.");
+                }
 
                 // Check if the first worksheet has data
                 var worksheet = package.Workbook.Worksheets.FirstOrDefault();
                 if (worksheet?.Dimension == null)
-                    return false;
+                {
+                    throw new InvalidOperationException("The first worksheet in the Excel file is empty.");
+                }
 
                 return await Task.FromResult(true);
             }
-            catch
+            catch (FileNotFoundException)
             {
-                return false;
+                throw;
+            }
+            catch (InvalidOperationException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Failed to read Excel file. The file may be corrupted or in an unsupported format. Error: {ex.Message}", ex);
             }
         }
     }

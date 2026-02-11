@@ -72,19 +72,18 @@ namespace ExcelDatabaseImportTool.Data.Context
                 entity.Property(e => e.DatabaseFieldName).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.IsRequired).IsRequired();
                 entity.Property(e => e.DataType).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.ImportConfigurationId).IsRequired();
 
                 // Configure relationships
+                entity.HasOne(f => f.ImportConfiguration)
+                    .WithMany(i => i.FieldMappings)
+                    .HasForeignKey(f => f.ImportConfigurationId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
                 entity.HasOne(f => f.ForeignKeyMapping)
                     .WithMany(fk => fk.FieldMappings)
                     .HasForeignKey(f => f.ForeignKeyMappingId)
                     .OnDelete(DeleteBehavior.SetNull);
-
-                // Add foreign key to ImportConfiguration
-                entity.Property<int>("ImportConfigurationId");
-                entity.HasOne<ImportConfiguration>()
-                    .WithMany(i => i.FieldMappings)
-                    .HasForeignKey("ImportConfigurationId")
-                    .OnDelete(DeleteBehavior.Cascade);
             });
 
             // Configure ForeignKeyMapping

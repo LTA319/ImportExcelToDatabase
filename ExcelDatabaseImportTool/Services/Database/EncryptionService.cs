@@ -47,7 +47,17 @@ namespace ExcelDatabaseImportTool.Services.Database
                 throw new ArgumentException("Encrypted text cannot be null or empty", nameof(encryptedText));
             }
 
-            var cipherBytes = Convert.FromBase64String(encryptedText);
+            byte[] cipherBytes;
+            try
+            {
+                cipherBytes = Convert.FromBase64String(encryptedText);
+            }
+            catch (FormatException ex)
+            {
+                throw new FormatException(
+                    "The encrypted text is not a valid Base-64 string. " +
+                    "It may be corrupted or was not properly encrypted.", ex);
+            }
 
             using var aes = Aes.Create();
             aes.Key = _key;

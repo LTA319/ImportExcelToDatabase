@@ -44,9 +44,7 @@ namespace ExcelDatabaseImportTool.Services.Database
 
                 if (!exists)
                 {
-                    _logger.LogInformation("Creating new database...");
-                    await _context.Database.EnsureCreatedAsync();
-                    _logger.LogInformation("Database created successfully");
+                    _logger.LogInformation("Creating new database with migrations...");
                 }
                 else
                 {
@@ -56,13 +54,15 @@ namespace ExcelDatabaseImportTool.Services.Database
                     await CheckAndUpgradeDatabaseAsync();
                 }
 
-                // Apply any pending migrations
+                // Apply any pending migrations (this will create the database if it doesn't exist)
                 await MigrateDatabaseAsync();
+                
+                _logger.LogInformation("Database initialization completed successfully");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to initialize database");
-                throw new InvalidOperationException("Failed to initialize database", ex);
+                throw new InvalidOperationException("Failed to initialize database. Please ensure the application has write permissions to the application directory.", ex);
             }
         }
 

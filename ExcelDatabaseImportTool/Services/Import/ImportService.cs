@@ -59,13 +59,8 @@ namespace ExcelDatabaseImportTool.Services.Import
                     throw new InvalidOperationException($"Database configuration with ID {config.DatabaseConfigurationId} not found");
                 }
 
-                // Validate Excel file
-                if (!await _excelReaderService.ValidateFileAsync(excelFilePath))
-                {
-                    throw new InvalidOperationException("Invalid Excel file format");
-                }
-
-                // Read Excel data
+                // Validate and read Excel file
+                await _excelReaderService.ValidateFileAsync(excelFilePath);
                 var dataTable = await _excelReaderService.ReadExcelFileAsync(excelFilePath);
                 if (dataTable.Rows.Count == 0)
                 {

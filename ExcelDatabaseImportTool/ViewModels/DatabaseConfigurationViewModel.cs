@@ -16,6 +16,7 @@ namespace ExcelDatabaseImportTool.ViewModels
     {
         private readonly IConfigurationRepository _configurationRepository;
         private readonly IDatabaseConnectionService _connectionService;
+        private readonly IEncryptionService _encryptionService;
         
         private ObservableCollection<DatabaseConfiguration> _configurations;
         private DatabaseConfiguration? _selectedConfiguration;
@@ -24,23 +25,28 @@ namespace ExcelDatabaseImportTool.ViewModels
         private bool _isTestingConnection;
         private string _connectionTestResult;
         private string _validationErrors;
+        private string _plainTextPassword;
 
         /// <summary>
         /// Initializes a new instance of DatabaseConfigurationViewModel
         /// </summary>
         /// <param name="configurationRepository">Repository for configuration data access</param>
         /// <param name="connectionService">Service for database connection operations</param>
+        /// <param name="encryptionService">Service for password encryption</param>
         public DatabaseConfigurationViewModel(
             IConfigurationRepository configurationRepository,
-            IDatabaseConnectionService connectionService)
+            IDatabaseConnectionService connectionService,
+            IEncryptionService encryptionService)
         {
             _configurationRepository = configurationRepository ?? throw new ArgumentNullException(nameof(configurationRepository));
             _connectionService = connectionService ?? throw new ArgumentNullException(nameof(connectionService));
+            _encryptionService = encryptionService ?? throw new ArgumentNullException(nameof(encryptionService));
             
             _configurations = new ObservableCollection<DatabaseConfiguration>();
             _currentConfiguration = new DatabaseConfiguration();
             _connectionTestResult = string.Empty;
             _validationErrors = string.Empty;
+            _plainTextPassword = string.Empty;
 
             // Initialize commands
             LoadConfigurationsCommand = new AsyncRelayCommand(LoadConfigurationsAsync);
@@ -56,6 +62,20 @@ namespace ExcelDatabaseImportTool.ViewModels
         }
 
         #region Properties
+
+        /// <summary>
+        /// Gets the available database types for the ComboBox
+        /// </summary>
+        public IEnumerable<DatabaseType> DatabaseTypes => Enum.GetValues(typeof(DatabaseType)).Cast<DatabaseType>();
+
+        /// <summary>
+        /// Gets or sets the plain text password (not persisted)
+        /// </summary>
+        public string PlainTextPassword
+        {
+            get => _plainTextPassword;
+            set => SetProperty(ref _plainTextPassword, value);
+        }
 
         /// <summary>
         /// Gets the collection of database configurations
@@ -189,6 +209,7 @@ namespace ExcelDatabaseImportTool.ViewModels
                 CreatedDate = DateTime.Now,
                 ModifiedDate = DateTime.Now
             };
+            PlainTextPassword = string.Empty;
             IsEditing = true;
             ValidationErrors = string.Empty;
             ConnectionTestResult = string.Empty;
@@ -217,6 +238,7 @@ namespace ExcelDatabaseImportTool.ViewModels
                     CreatedDate = config.CreatedDate,
                     ModifiedDate = DateTime.Now
                 };
+                PlainTextPassword = string.Empty; // Don't show existing password
                 IsEditing = true;
                 ValidationErrors = string.Empty;
                 ConnectionTestResult = string.Empty;
@@ -261,6 +283,12 @@ namespace ExcelDatabaseImportTool.ViewModels
         {
             try
             {
+                // Encrypt the password if a new one was entered
+                if (!string.IsNullOrEmpty(PlainTextPassword))
+                {
+                    CurrentConfiguration.EncryptedPassword = _encryptionService.Encrypt(PlainTextPassword);
+                }
+
                 // Validate the configuration
                 var validationResults = ValidateConfiguration(CurrentConfiguration);
                 if (validationResults.Any())
@@ -284,6 +312,7 @@ namespace ExcelDatabaseImportTool.ViewModels
                 await LoadConfigurationsAsync();
 
                 IsEditing = false;
+                PlainTextPassword = string.Empty;
                 ValidationErrors = string.Empty;
                 ConnectionTestResult = string.Empty;
             }
@@ -297,6 +326,7 @@ namespace ExcelDatabaseImportTool.ViewModels
         {
             IsEditing = false;
             CurrentConfiguration = new DatabaseConfiguration();
+            PlainTextPassword = string.Empty;
             ValidationErrors = string.Empty;
             ConnectionTestResult = string.Empty;
         }
@@ -313,7 +343,20 @@ namespace ExcelDatabaseImportTool.ViewModels
 
             try
             {
-                var success = await _connectionService.TestConnectionAsync(CurrentConfiguration);
+                // Create a temporary configuration with encrypted password for testing
+                var testConfig = new DatabaseConfiguration
+                {
+                    Type = CurrentConfiguration.Type,
+                    Server = CurrentConfiguration.Server,
+                    Database = CurrentConfiguration.Database,
+                    Username = CurrentConfiguration.Username,
+                    Port = CurrentConfiguration.Port,
+                    EncryptedPassword = !string.IsNullOrEmpty(PlainTextPassword) 
+                        ? _encryptionService.Encrypt(PlainTextPassword)
+                        : CurrentConfiguration.EncryptedPassword
+                };
+
+                var success = await _connectionService.TestConnectionAsync(testConfig);
                 ConnectionTestResult = success ? "Connection successful!" : "Connection failed.";
             }
             catch (Exception ex)
@@ -346,7 +389,8 @@ namespace ExcelDatabaseImportTool.ViewModels
             if (string.IsNullOrWhiteSpace(config.Username))
                 errors.Add("Username is required.");
 
-            if (string.IsNullOrWhiteSpace(config.EncryptedPassword))
+            // Check if password is provided (either new plain text or existing encrypted)
+            if (string.IsNullOrWhiteSpace(PlainTextPassword) && string.IsNullOrWhiteSpace(config.EncryptedPassword))
                 errors.Add("Password is required.");
 
             if (config.Port <= 0 || config.Port > 65535)
