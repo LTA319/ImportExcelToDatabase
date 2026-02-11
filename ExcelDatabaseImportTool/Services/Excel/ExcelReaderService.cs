@@ -11,7 +11,13 @@ namespace ExcelDatabaseImportTool.Services.Excel
         {
             try
             {
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                // EPPlus 8.x - use reflection to set license
+                var licenseType = ExcelPackage.License.GetType();
+                var field = licenseType.GetField("_licenseType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (field != null)
+                {
+                    field.SetValue(ExcelPackage.License, 1); // NonCommercial = 1
+                }
             }
             catch
             {

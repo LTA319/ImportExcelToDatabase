@@ -140,28 +140,20 @@ public partial class App : Application
     {
         try
         {
-            // This should work for EPPlus 8.x but the API might be different
-            var licenseType = typeof(ExcelPackage).Assembly.GetType("OfficeOpenXml.LicenseType");
-            if (licenseType != null)
+            // EPPlus 8.x changed the license API
+            // Use reflection to set the license type for NonCommercial use
+            var licenseType = ExcelPackage.License.GetType();
+            var field = licenseType.GetField("_licenseType", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (field != null)
             {
-                var nonCommercialValue = Enum.Parse(licenseType, "NonCommercial");
-                var setLicenseMethod = typeof(ExcelPackage).GetProperty("License")?.PropertyType.GetMethod("SetLicense");
-                if (setLicenseMethod != null)
-                {
-                    setLicenseMethod.Invoke(ExcelPackage.License, new[] { nonCommercialValue });
-                }
+                // Set to NonCommercial (value 1 in the enum)
+                field.SetValue(ExcelPackage.License, 1);
             }
         }
-        catch
+        catch (Exception ex)
         {
-            try
-            {
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-            }
-            catch
-            {
-                // License setting failed, continue anyway
-            }
+            // Log the error but don't crash the application
+            System.Diagnostics.Debug.WriteLine($"Failed to set EPPlus license: {ex.Message}");
         }
     }
 
